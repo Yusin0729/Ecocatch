@@ -443,6 +443,8 @@ function setupMap() {
         collapsibleContent.classList.add("hidden");
         toggleIcon.style.transform = "rotate(180deg)";
       }
+      // Update locate-me button position when toggling drawer details
+      updateLocateMeButtonPosition();
     });
   }
 
@@ -516,6 +518,41 @@ function setupMap() {
       }
     );
   });
+
+  // Listen to window resize to adjust button position on orientation change or screen resizing
+  window.addEventListener("resize", updateLocateMeButtonPosition);
+  // Initial check
+  updateLocateMeButtonPosition();
+}
+
+// Adjust GPS button positioning on mobile devices depending on drawer state
+function updateLocateMeButtonPosition() {
+  const btnLocateMe = document.getElementById("btn-locate-me");
+  const mapTargetDrawer = document.getElementById("map-target-drawer");
+  const collapsibleContent = document.getElementById("drawer-collapsible-content");
+  
+  if (!btnLocateMe) return;
+  
+  // Only apply on mobile devices (width < 768px)
+  if (window.innerWidth >= 768) {
+    btnLocateMe.style.bottom = ""; // Desktop: reset to default tailwind classes (bottom-6)
+    return;
+  }
+  
+  if (!mapTargetDrawer || mapTargetDrawer.classList.contains("hidden")) {
+    // Drawer is hidden: default position (24px, same as bottom-6)
+    btnLocateMe.style.bottom = "24px";
+  } else {
+    // Drawer is visible
+    const isCollapsed = collapsibleContent ? collapsibleContent.classList.contains("hidden") : false;
+    if (isCollapsed) {
+      // Drawer is collapsed: position above the header
+      btnLocateMe.style.bottom = "110px";
+    } else {
+      // Drawer is expanded: position above the full drawer
+      btnLocateMe.style.bottom = "240px";
+    }
+  }
 }
 
 // LBS KD-Tree & Dijkstra nearest search
@@ -595,6 +632,8 @@ function searchNearestBin(categoryId = null) {
   if (toggleIcon) {
     toggleIcon.style.transform = "rotate(0deg)";
   }
+  // Update locate-me button position when showing target drawer
+  updateLocateMeButtonPosition();
 
   // Dynamically update user node (n0) connections in the road graph using KD-Tree
   if (roadGraph && graphNodes) {
@@ -766,6 +805,8 @@ function handleDepositSuccess() {
       activeScanItem = null;
       document.getElementById("result-drawer").classList.add("hidden");
       document.getElementById("map-target-drawer")?.classList.add("hidden");
+      // Update locate-me button position when target drawer is hidden
+      updateLocateMeButtonPosition();
       if (routeLine) {
         map.removeLayer(routeLine);
       }

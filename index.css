@@ -166,3 +166,8 @@ details[open] .toggle-label::after {
   transform: scale(0.95);
   filter: brightness(0.9);
 }
+
+/* Smooth transition for locate-me button when it shifts on mobile */
+#btn-locate-me {
+  transition: bottom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.15s ease, background-color 0.15s ease, color 0.15s ease !important;
+}
